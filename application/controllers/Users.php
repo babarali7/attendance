@@ -140,6 +140,13 @@ class Users extends My_controller {
 
    public function reset_pass($id,$username) {
      
+     if(!$this->session->userdata('user_id')){ 
+        
+        	 redirect(base_url() . 'users/login');
+
+       }
+
+
      $pass = md5("12345678");
 
      $update = array("U_PASSWORD" => $pass );
@@ -174,6 +181,13 @@ class Users extends My_controller {
      
     extract($_POST);
      
+     if(!$this->session->userdata('user_id')){ 
+        
+        	 redirect(base_url() . 'users/login');
+
+       }
+
+
     $username = $this->session->userdata("username");
 
      $whr = array(
@@ -215,7 +229,7 @@ class Users extends My_controller {
    public function update_db() {
      
          
-	// $ip  = "59.103.27.194:81";
+	
 	 $ip = "192.168.10.140:81";
     
      // get last date time from the table
@@ -253,7 +267,7 @@ class Users extends My_controller {
 	        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 	        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
-	        curl_setopt($ch, CURLOPT_USERPWD, "admin" . ":" . "0000abcd");     
+	        curl_setopt($ch, CURLOPT_USERPWD, "username" . ":" . "password");     
 	        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 	        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 	        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
