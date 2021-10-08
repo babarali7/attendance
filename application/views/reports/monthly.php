@@ -3,8 +3,8 @@
 <script type="text/javascript">
   
    $(document).ready(function() {
- 
-      $('.daterange').daterangepicker();
+
+      $(".daterange").daterangepicker();
  
   });
 
@@ -18,7 +18,7 @@
            <div class="col-md-4 ml-auto"> 
                 <form class="navbar-form" action="<?=base_url();?>reports/monthly" method="GET">
                   <div class="input-group no-border">
-                    <input type="text" value="" name="date" class="form-control daterange" placeholder="">
+                    <input type="text" value="<?php echo $start_date.' - '.$end_date;?>" name="date" class="form-control daterange" placeholder="">
                     <button type="submit" class="btn btn-white btn-round btn-just-icon">
                       <i class="material-icons">search</i>
                       <div class="ripple-container"></div>
@@ -28,7 +28,7 @@
             </div>
         </div>  
 
-         
+        
 
         <div class="row">
           <div class="col-md-12">
@@ -37,95 +37,126 @@
                   <div class="card-icon">
                     <i class="material-icons">assignment</i>
                   </div>
-                  <h4 class="card-title">Daily Attendence Report ( <?=date("l, d M Y",strtotime($rp_date));?> )</h4>
+                  <h4 class="card-title"> Attendence Report ( <?=date("d M Y",strtotime($start_date));?> - <?=date("d M Y",strtotime($end_date));?>  )</h4>
                 </div>
                 <div class="card-body">
                   <div class="toolbar">
                     <!--        Here you can write extra buttons/actions for the toolbar              -->
                   </div>
                   <div class="material-datatables">
-                    <table id="datatables" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">
+                    <table class="table table-striped table-bordered table-hover table-responsive" cellspacing="0" >
                       <thead>
                         <tr>
                           <th>S#</th>
-                          <th>Image</th>
-                          <th>Emp ID</th>  
                           <th>Name</th>
                           <th>Designation</th>
-                          <th>BPS</th>
-                          <th>TimeIn</th>
-                          <th>TimeOut</th>
-                          <th>Status</th>
+                          <th>Date</th>
+
+                          <?php
+
+                            $he_start_date = $f_start_date = $in_start_date = $start_date;
+                            $he_end_date = $f_end_date = $in_end_date =  $end_date;
+
+                          while (strtotime($he_start_date) <= strtotime($he_end_date)) {
+                                $timestamp = strtotime($he_start_date);
+                                $hd = "";
+                                $day = date('d', $timestamp);
+                              //  echo "$start_date" . "  $day";                                 
+                                $week = date('D', $timestamp);
+                                $hd = "($week)";                                 
+
+                               echo "<th> $day <small>$hd</small> </th>";
+
+                                $he_start_date = date ("Y-m-d", strtotime("+1 days", strtotime($he_start_date)));
+                          }
+
+
+                          ?>
+                          
+
+
                         </tr>
                       </thead>
                       <tfoot>
                         <tr>
                           <th>S#</th>
-                          <th>Image</th>
-                          <th>Emp ID</th>  
                           <th>Name</th>
                           <th>Designation</th>
-                          <th>BPS</th>
-                          <th>TimeIn</th>
-                          <th>TimeOut</th>
-                          <th>Status</th>
+                          <th>Date</th>
+
+
+                          <?php
+
+                          while (strtotime($f_start_date) <= strtotime($f_end_date)) {
+                                $timestamp = strtotime($f_start_date);
+                                $hd = "";
+                                $day = date('d', $timestamp);
+                                $week = date('D', $timestamp);
+                                $hd = "($week)";
+                               //  echo "$start_date" . "  $day";
+                               echo "<th> $day <small>$hd</small> </th>";
+
+                                $f_start_date = date ("Y-m-d", strtotime("+1 days", strtotime($f_start_date)));
+                          }
+
+
+                          ?>
+                          
                         </tr>
                       </tfoot>
                       <tbody>
  
-                       <?php $sno = 1; foreach($daily as $rp): ?>
+                       <?php $sno = 1; foreach($emp as $em): 
                            
+                               $in_start_date = $start_date;
+                               $in_end_date = $end_date;
+                               $st_d_time = $en_d_time = "";
+                           while (strtotime($in_start_date) <= strtotime($in_end_date)) {
+                             
+                                $result =  $mycontroller->bring_emp_attend($em->EMP_DEVICE_ID,$in_start_date);
+
+                              //  print_r($result);
+                               
+                                if($result['max_in'] == NULL && $result['max_out'] == NULL){
+                               
+                                  $st_d_time .= "<td class='text-danger'>A</td>";
+                                  $en_d_time .= "<td class='text-danger'>A</td>"; 
+
+                                } else {
+
+                                
+                                 $st_d_time .= "<td>".date("H:i",strtotime($result['max_in']))."</td>";
+                                 $en_d_time .= "<td>".date("H:i",strtotime($result['max_out']))."</td>";
+ 
+
+                                }
+                                 
+
+                                $in_start_date = date ("Y-m-d", strtotime("+1 days", strtotime($in_start_date)));
+                          }
+                           
+
+
+                       ?>
+                           
+                           
+
+
                         <tr>
-                            <td> <?=$sno;?> </td>
-                            <td> <img src="<?=base_url();?>assets/img/employee/<?=$rp->EMP_IMAGE;?>" width="80" 
-                                height="80"> </td>
-                            <td> <?=$rp->EMP_DEVICE_ID;?> </td>
-                            <td> <?=$rp->EMP_NAME;?> </td>
-                            <td> <?=$rp->DESIG_NAME;?> </td>
-                            <td> BPS-<?=$rp->EMP_BPS;?> </td>
-                              
-                              <?php if( $rp->min_time != NULL && $rp->max_time != NULL ) {
-                                     
-                                        if( date("H:i",strtotime($rp->min_time)) <= date("H:i", strtotime("9:15")) ) :
-                                          $status = "<span class='badge badge-pill badge-success'>PRESENT</span>";
-                                          $start_time = date("H:i",strtotime($rp->min_time));
-                                          $end_time =   date("H:i",strtotime($rp->max_time));
-                                        else:
-                                          $status = "<span class='badge badge-pill badge-warning'>PRESENT / LATE</span>";
-                                          $start_time = date("H:i",strtotime($rp->min_time));
-                                          $end_time =   date("H:i",strtotime($rp->max_time));
-                                        endif;
+                            <td rowspan="2"> <?=$sno;?> </td>
+                            <td rowspan="2"> <?=$em->EMP_NAME;?> </td>
+                            <td rowspan="2"> <?=$em->DESIG_NAME;?>( BPS-<?=$em->EMP_BPS;?> ) </td>
+                            <td><b> IN </b></td>
+                                                        
+                            <?=$st_d_time;?>
 
-                                    } else if($rp->min_time != NULL && $rp->max_time == NULL) {
+                         </tr>
 
-                                         if(date("H:i",strtotime($rp->min_time)) >= date("H:i", strtotime("4:00")) ):
-                                           $status = "<span class='badge badge-pill badge-warning'>PRESENT</span>";
-                                           $start_time = "<span class='alert alert-danger'>Time In Missing</span>";
-                                           $end_time = date("H:i",strtotime($rp->min_time));
-                                         elseif(date("H:i",strtotime($rp->min_time)) <= date("H:i", strtotime("9:15")) ):
-                                           $status = "<span class='badge badge-pill badge-success'>PRESENT</span>";
-                                           $start_time = date("H:i",strtotime($rp->min_time));
-                                           $end_time = "<span class='alert alert-danger'>Time Out Missing</span>";  
-                                         else:
-                                           $status = "<span class='badge badge-pill badge-warning'>PRESENT / LATE</span>";
-                                           $start_time = date("H:i",strtotime($rp->min_time));
-                                           $end_time = "<span class='alert alert-danger'>Time Out Missing</span>";
-                                         endif; 
+                         <tr>
+                              <td><b> Out </b></td>
+                              <?=$en_d_time;?>
 
-                                    } else {
-                                         
-                                           $status = "<span class='badge badge-pill badge-danger'>ABSENT</span>";
-                                           $start_time = " -- ";
-                                           $end_time = " -- ";   
-
-                                    } ?>
-
-
-                            <td> <?=$start_time;?> </td>
-                            <td> <?=$end_time;?> </td>
-                            <td> <?=$status;?> </td>
-
-                        </tr>   
+                         </tr>   
 
                         <?php  $sno++;  endforeach; ?>
 
