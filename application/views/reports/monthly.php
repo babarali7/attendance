@@ -63,7 +63,9 @@
                                 $day = date('d', $timestamp);
                               //  echo "$start_date" . "  $day";                                 
                                 $week = date('D', $timestamp);
-                                $hd = "($week)";                                 
+                                $hd = "($week)";
+
+                                                                 
 
                                echo "<th> $day <small>$hd</small> </th>";
 

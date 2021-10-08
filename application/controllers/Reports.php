@@ -76,6 +76,7 @@ class Reports extends MY_Controller {
             
              $start = date("m/01/Y");
              $finish = date("m/t/Y");
+             
          
          }
 
