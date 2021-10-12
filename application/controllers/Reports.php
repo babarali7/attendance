@@ -53,7 +53,6 @@ class Reports extends MY_Controller {
    public function monthly() {
         
        if($this->input->get("date")) { 
-         
             
          //   echo $this->input->get("date");
              
@@ -76,7 +75,7 @@ class Reports extends MY_Controller {
             
              $start = date("m/01/Y");
              $finish = date("m/t/Y");
-             
+
          
          }
 
@@ -102,8 +101,6 @@ class Reports extends MY_Controller {
       $this->load->view('reports/monthly',$data);
      
       $this->footer();
-
-
 
 
    }
@@ -136,6 +133,48 @@ class Reports extends MY_Controller {
     }
 
    
+    public function weekly() {
+       
+        if($this->input->get("date")) { 
+            
+            $dat = explode("-", $this->input->get("date"));
+        
+            $start  = date("m/d/Y",strtotime($dat[0]));
+            //echo "<br/>";
+            $finish =  date("m/d/Y", strtotime($dat[1]));  
+
+
+         } else { 
+       
+           $start = (date('D') != 'Mon') ? date('m/d/Y', strtotime('last Monday')) : date('m/d/Y');
+           $finish = (date('D') != 'Sat') ? date('m/d/Y', strtotime('next Saturday')) : date('m/d/Y');
+         
+         }
+
+      $this->header();
+      
+      $data['mycontroller'] = $this;
+
+
+      $data['emp'] = $this->general->fetch_CoustomQuery("SELECT E.`EMP_ID`,E.`EMP_NAME`,E.`EMP_DEVICE_ID`, 
+                                 d.DESIG_NAME, e.EMP_BPS
+                                 FROM `employee` E
+                                 LEFT JOIN
+                                 designations as d 
+                                 ON
+                                 e.DESIG_ID = d.DESIG_ID");
+
+      $data['start_date'] = $start;
+      $data['end_date'] = $finish;
+    
+      $this->load->view('reports/weekly',$data);
+     
+      $this->footer();   
+
+
+    }
+
+
 
 
 
