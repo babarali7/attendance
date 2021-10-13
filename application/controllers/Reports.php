@@ -174,7 +174,78 @@ class Reports extends MY_Controller {
 
     }
 
+    
+    public function employeeAttendance() {
+        
+        if($this->input->get("date")) { 
+            
+            $dat = explode("-", $this->input->get("date"));
+        
+            $start  = date("m/d/Y",strtotime($dat[0]));
+            //echo "<br/>";
+            $finish =  date("m/d/Y", strtotime($dat[1]));  
+          
+           if($this->input->get("emp")) {
 
+               $emp = $this->input->get("emp");
+
+               $start_dd = date("Y-m-d",strtotime($dat[0]));
+               $end_dd = date("Y-m-d", strtotime($dat[1]));
+            
+              $query = "SELECT '{$start_dd}' + INTERVAL a + b DAY dte , 
+              (SELECT MIN(a.AT_DATE_TIME) as checkin  FROM `attendence` as a WHERE a.EMP_DEVICE_ID = {$emp} AND 
+              DATE(a.AT_DATE_TIME) = dte) as min_time, 
+              (SELECT MAX(a.AT_DATE_TIME) as checkin FROM `attendence` as a WHERE a.EMP_DEVICE_ID = {$emp} AND 
+              DATE(a.AT_DATE_TIME) = dte) as max_time  
+              FROM 
+              (SELECT 0 a UNION SELECT 1 a UNION SELECT 2 UNION SELECT 3 
+              UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 
+              UNION SELECT 8 UNION SELECT 9 ) d, 
+              (SELECT 0 b UNION SELECT 10 UNION SELECT 20 
+              UNION SELECT 30 UNION SELECT 40) m 
+              WHERE '{$start_dd}' + INTERVAL a + b DAY  <=  '{$end_dd}' 
+              ORDER BY a + b";
+
+              $data['emp_result'] = $this->general->fetch_CoustomQuery($query);
+
+              // also get emp basic info
+
+               $join = array("designations" => "employee.DESIG_ID = designations.DESIG_ID");
+
+              $data['emp_basic'] = $this->general->join_mutitple_table("employee", $join, array("employee.EMP_DEVICE_ID" => $emp));
+
+           }
+
+
+
+         } else { 
+       
+           $start = (date('D') != 'Mon') ? date('m/d/Y', strtotime('last Monday')) : date('m/d/Y');
+           $finish = (date('D') != 'Sat') ? date('m/d/Y', strtotime('next Saturday')) : date('m/d/Y');
+         
+         }
+
+      $this->header();
+
+       $data['emp'] = $this->general->fetch_CoustomQuery("SELECT E.`EMP_ID`,E.`EMP_NAME`,E.`EMP_DEVICE_ID`, 
+                                 d.DESIG_NAME, e.EMP_BPS
+                                 FROM `employee` E
+                                 LEFT JOIN
+                                 designations as d 
+                                 ON
+                                 e.DESIG_ID = d.DESIG_ID");
+      
+    //  $data['mycontroller'] = $this;
+
+      $data['start_date'] = $start;
+      $data['end_date'] = $finish;
+    
+      $this->load->view('reports/employee',$data);
+     
+      $this->footer();
+
+
+    }
 
 
 
