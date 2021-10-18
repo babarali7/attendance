@@ -55,27 +55,8 @@
   <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="<?=base_url();?>assets/js/material-dashboard.js?v=2.1.2" type="text/javascript"></script>
    
-       <!-- Include Quill stylesheet -->
-   <!--     <link rel="stylesheet" href="https://cdn.quilljs.com/1.3.6/quill.snow.css" />  
- 
-       <script src="//cdn.quilljs.com/1.0.0/quill.min.js"></script>
-  -->
-    <!-- Include the Quill library -->
- <!--   <script src="https://cdn.quilljs.com/1.0.0/quill.js"></script>  -->
-
-      <!-- Initialize Quill editor -->
-       <!-- <script>
-        var quill = new Quill('#editor-container', {
-          modules: {
-            syntax: true,
-            toolbar: '#toolbar-container'
-          },
-          placeholder: 'Compose an epic...',
-          theme: 'snow'
-        });       
-      </script> -->
-  
-
+  <!-- Excel Export plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/tableexport.jquery.plugin@1.6.4/tableExport.min.js"></script>
  
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />

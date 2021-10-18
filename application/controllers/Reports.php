@@ -212,7 +212,7 @@ class Reports extends MY_Controller {
 
                $join = array("designations" => "employee.DESIG_ID = designations.DESIG_ID");
 
-              $data['emp_basic'] = $this->general->join_mutitple_table("employee", $join, array("employee.EMP_DEVICE_ID" => $emp));
+              $data['emp_basic'] = $this->general->join_multiple_table("employee", $join, array("employee.EMP_DEVICE_ID" => $emp));
 
            }
 

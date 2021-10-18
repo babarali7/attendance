@@ -527,7 +527,84 @@ class Generals extends MY_Controller {
 
   }
 
+   
+
+    public function leave_types() {
+    
+        $this->header();
+        
+        $data['list'] = $this->general->fetch_records("leave_types");
+        
+        $this->load->view('generals/leave_types', $data);
+        
+        $this->footer();
+
+ }
+
   
+
+    public function create_leave() {
+      extract($_POST);
+
+      $dt = date("Y-m-d H:i:s");
+                
+                 if($this->input->post('leave_id') != "") {
+                      // echo "updated";
+                  $comapny_dataArray = array(
+                                             "LEAVE_NAME"   =>   $this->input->post('leave_name'),
+                                            );
+
+                $this->general->update_record($comapny_dataArray, array("LEAVE_ID" => $this->input->post('leave_id')),"leave_types");
+
+                $this->general->set_msg("Record Updated successfully",3);
+
+                
+                 }  else {
+                 
+                 // echo "inserted";
+                       $comapny_dataArray = array(
+                                                  "LEAVE_NAME"     => $this->input->post('leave_name'),
+                                                  "CREATED_DATE"   => date("Y-m-d H:i:s"),
+                                                  "CREATED_USERID" => $this->session->userdata('user_id')
+                                                 );
+
+                     $this->general->create_record($comapny_dataArray, "leave_types");
+
+                     $this->general->set_msg("Record added successfully",1);
+    
+
+                 }
+   
+                 redirect(base_url().'generals/leave_types');
+   
+    }
+  
+
+    public function get_leave() {
+      
+     extract($_POST);
+      
+     $qry = $this->general->fetch_bysinglecol("LEAVE_ID", "leave_types", $c_id);
+
+      $data_events;
+
+           foreach($qry as $result):
+          
+          $data_events[] = array(
+             "LEAVE_NAME"               => $result->LEAVE_NAME,
+             "LEAVE_ID"                 => $result->LEAVE_ID
+             
+            ); 
+
+
+        endforeach;           
+
+         
+         print json_encode($data_events);
+  
+ 
+    }
+
 
 }
 

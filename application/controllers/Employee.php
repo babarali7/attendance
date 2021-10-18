@@ -201,5 +201,56 @@ class Employee extends MY_Controller {
 
 
 
+ public function manual_attendance() {
+
+    $this->header();
+      
+        $join = array("designations" => "employee.DESIG_ID = designations.DESIG_ID");
+
+        $data['emp'] = $this->general->join_multiple_table("employee", $join);
+         
+         $list_join = array(
+                            "designations" => "employee.DESIG_ID = designations.DESIG_ID",
+                             "attendence"   => "employee.EMP_DEVICE_ID = attendence.EMP_DEVICE_ID"
+                            );
+
+        $data["list"] = $this->general->join_multiple_table("employee", $list_join, array("attendence.AT_MANUAL" => 1));
+    
+
+      $this->load->view('employee/manual_attendance',$data);
+    
+    
+    $this->footer();
+
+
+
+
+ }
+
+
+
+   public function add_manual_attend() {
+       extract($_POST);
+
+    $data = array(
+                   "EMP_DEVICE_ID"     => $emp_name,
+                   "AT_DATE_TIME"      => date("Y-m-d H:i:s", strtotime($date_time)),
+                   "AT_MANUAL"         => 1,
+                   "CREATED_DATE"      => date("Y-m-d H:i:s") ,
+                   "CREATED_USERID"    => $this->session->userdata('user_id')
+
+                );
+
+      $this->general->create_record($data, "attendence");
+
+      $this->general->set_msg("Record Added Successfully",1);
+      
+
+       redirect(base_url().'employee/manual_attendance');
+      
+
+   }
+
+
 } // end class
 

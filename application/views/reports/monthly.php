@@ -1,4 +1,3 @@
-<script src="https://cdn.jsdelivr.net/npm/tableexport.jquery.plugin@1.6.4/tableExport.min.js"></script>
 
 <script type="text/javascript">
   

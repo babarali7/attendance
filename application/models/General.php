@@ -443,7 +443,7 @@ class General extends CI_Model {
    }
 
 
-  function join_mutitple_table($first_table, $multiple_table, $where=NULL ) {
+  function join_multiple_table($first_table, $multiple_table, $where=NULL ) {
    
      $this->db->select();
      
