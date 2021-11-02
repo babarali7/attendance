@@ -232,11 +232,12 @@ class Employee extends MY_Controller {
    public function add_manual_attend() {
        extract($_POST);
 
-    $data = array(
+       $data = array(
                    "EMP_DEVICE_ID"     => $emp_name,
                    "AT_DATE_TIME"      => date("Y-m-d H:i:s", strtotime($date_time)),
                    "AT_MANUAL"         => 1,
-                   "CREATED_DATE"      => date("Y-m-d H:i:s") ,
+                   "AT_REMARKS"        => $remarks,
+                   "CREATED_DATE"      => date("Y-m-d H:i:s"),
                    "CREATED_USERID"    => $this->session->userdata('user_id')
 
                 );
@@ -248,6 +249,144 @@ class Employee extends MY_Controller {
 
        redirect(base_url().'employee/manual_attendance');
       
+
+   }
+
+
+   public function emp_leave() {
+     
+     $this->header();
+      
+        $join = array("designations" => "employee.DESIG_ID = designations.DESIG_ID");
+
+        $data['emp'] = $this->general->join_multiple_table("employee", $join);
+
+        $data['leave_type'] = $this->general->fetch_records("leave_types");
+
+
+
+        // if search form is submited
+         
+          extract($_GET);
+      
+      
+        if( $this->input->get("s_emp_name") ) {
+           //echo $this->input->get("s_emp_name");
+           $em = " AND e.EMP_ID = ".$this->input->get("s_emp_name"); 
+
+        } else {
+           //  echo "not selected";
+           $em = "";
+
+        }
+
+
+        if( $this->input->get("s_leave_name") ) {
+           
+           $ln = " AND lt.LEAVE_ID = ".$this->input->get("s_leave_name"); 
+
+        } else {
+
+           $ln = "";
+
+        } 
+
+        
+        if($this->input->get("s_st_date") != NULL) {
+            
+            $dat = "";  $st_dt = " AND (";
+
+            $str_d = $this->input->get("s_st_date");
+
+            WHILE (strtotime($this->input->get("s_end_date")) >=  strtotime($str_d) ) {
+              
+               $dat = date("Y-m-d",  strtotime($str_d));
+
+               $st_dt .= "'".$dat."' BETWEEN el.EL_START_DATE AND el.EL_END_DATE";
+
+               $str_d = date('Y-m-d', strtotime($dat . " +1 days"));
+        
+
+                if( strtotime($str_d) <= strtotime($this->input->get("s_end_date")) ):
+
+                    $st_dt .= " || ";
+           
+                else:
+                   
+                   $st_dt .= " )";
+
+                endif;   
+
+            }
+
+                
+        } else {
+         
+           $st_dt = "";  
+       
+        }
+        
+    
+      $query = "SELECT el.EMP_ID, el.EL_START_DATE, el.EL_END_DATE, el.EL_REMARKS, e.EMP_NAME, lt.LEAVE_NAME, d.DESIG_NAME 
+                FROM `emp_leave` as el, employee as e, leave_types as lt, designations as d 
+                WHERE 
+                el.EMP_ID = e.EMP_ID 
+                AND 
+                el.LEAVE_ID = lt.LEAVE_ID 
+                AND 
+                e.DESIG_ID = d.DESIG_ID".$em.$ln.$st_dt;
+
+
+       $data['result'] = $this->general->fetch_CoustomQuery($query);
+
+
+        // end of search form
+         
+      
+      $this->load->view('employee/emp_leave',$data);
+    
+    
+    $this->footer();
+
+
+   }
+
+
+   public function add_emp_leave() {
+      
+      extract($_POST);
+
+       $data = array(
+                   "EMP_ID"            => $emp_name,
+                   "LEAVE_ID"          => $leave_name,
+                   "EL_START_DATE"     => date("Y-m-d H:i:s", strtotime($st_date)),
+                   "EL_END_DATE"       => date("Y-m-d H:i:s", strtotime($end_date)),
+                   "EL_REMARKS"        => $remarks,
+                   "CREATED_DATE"      => date("Y-m-d H:i:s") ,
+                   "CREATED_USERID"    => $this->session->userdata('user_id')
+
+                );
+
+      $this->general->create_record($data, "emp_leave");
+
+      $this->general->set_msg("Leave Added Successfully",1);
+      
+
+       redirect(base_url().'employee/emp_leave');
+
+
+
+   } 
+
+
+
+   public function search_emp_leave() {
+    
+     
+
+
+        
+
 
    }
 

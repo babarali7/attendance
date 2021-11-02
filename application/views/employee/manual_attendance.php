@@ -4,11 +4,11 @@
 
     $(".dataExport").click(function() {
        var exportType = $(this).data('type');    
-         $('#datatable').tableExport({
+          $('#datatable').tableExport({
             type : exportType,      
             escape : 'false',
             ignoreColumn: []
-         });   
+          });   
     });
 
   });
@@ -108,6 +108,7 @@
                           <th>Name</th>
                           <th>Designation</th>
                           <th>Date Time</th>
+                          <th>Remarks</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -119,6 +120,7 @@
                             <td> <?=$ls->EMP_NAME;?> </td>
                             <td> <?=$ls->DESIG_NAME;?> ( BPS - <?=$ls->EMP_BPS;?> ) </td>
                             <td> <?=date("d-m-Y h:i A", strtotime($ls->AT_DATE_TIME));?> </td>
+                            <td> <?=$ls->AT_REMARKS;?> </td>
 
                          </tr>  
                        
@@ -133,6 +135,7 @@
                           <th>Name</th>
                           <th>Designation</th>
                           <th>Date Time</th>
+                          <th>Remarks</th>
                         </tr>
                       </tfoot>
                       <tbody>
