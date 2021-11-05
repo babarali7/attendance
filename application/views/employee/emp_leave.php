@@ -236,19 +236,13 @@
 <script type="text/javascript">
   
    function check_date() {
-      var x = $("#ss_st").value;
-      var y = $("#ss_ed").value;
-      if( x != "" && y != "" ) {
-  
-        return true;
+    
+      var x = $("#ss_st").val();
+      var y = $("#ss_ed").val(); 
 
-      } else {
-          
-        alert($("#ss_st").val());
+      if( (x != "" && y == "") ||  (x == "" && y != "")  ) {
 
-        alert($("#ss_ed").val());
-        
-            Swal.fire({
+        Swal.fire({
                         position: 'center',
                         icon: 'error',
                         title: 'Please Enter From and To Date',
@@ -256,6 +250,10 @@
                         timer: 3000
                       });
         return false;
+
+      } else {
+          
+        return true;
 
       }
    
