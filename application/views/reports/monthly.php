@@ -134,22 +134,29 @@
  
                        <?php $sno = 1; foreach($emp as $em): 
                            
-                               $in_start_date = $start_date;
+                               $in_start_date = date("Y-m-d",strtotime($start_date));
                                $in_end_date = $end_date;
                                $st_d_time = $en_d_time = "";
                            while (strtotime($in_start_date) <= strtotime($in_end_date)) {
                              
-                                $result =  $mycontroller->bring_emp_attend($em->EMP_DEVICE_ID,$in_start_date);
+                                $result =  $mycontroller->bring_emp_attend($em->EMP_DEVICE_ID,$in_start_date, $em->EMP_ID);
 
-                              //  print_r($result);
-                               
-                                if($result['max_in'] == NULL && $result['max_out'] == NULL){
-                               
-                                  $st_d_time .= "<td class='text-danger'>A</td>";
-                                  $en_d_time .= "<td class='text-danger'>A</td>"; 
+                                //  print_r($result);
+                               if($result['max_in'] == NULL && $result['max_out'] == NULL){
+                                  
+                                   if($result['leave_status'] != "NO-LEAVE") {
+
+                                      $st_d_time .= "<td class='text-primary'>L</td>";
+                                      $en_d_time .= "<td class='text-primary'>L</td>";
+
+                                    } else { 
+
+                                      $st_d_time .= "<td class='text-danger'>A</td>";
+                                      $en_d_time .= "<td class='text-danger'>A</td>"; 
+
+                                    }
 
                                 } else {
-
                                 
                                  $st_d_time .= "<td>".date("H:i",strtotime($result['max_in']))."</td>";
                                  $en_d_time .= "<td>".date("H:i",strtotime($result['max_out']))."</td>";

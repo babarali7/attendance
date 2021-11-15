@@ -97,7 +97,14 @@
                                            $status = "<span class='badge badge-pill badge-warning'>PRESENT / LATE</span>";
                                            $start_time = date("H:i",strtotime($rp->min_time));
                                            $end_time = "<span class='alert alert-danger'>Time Out Missing</span>";
-                                         endif; 
+                                         endif;
+
+                                    } else if($rp->leave_status != "NO-LEAVE") {
+                                          
+                                          $status = "<span class='badge badge-pill badge-warning'>".$rp->leave_status."</span>";
+                                          $start_time = " -- ";
+                                          $end_time = " -- ";
+                                          
 
                                     } else {
                                          

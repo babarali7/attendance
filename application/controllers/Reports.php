@@ -23,21 +23,38 @@ class Reports extends MY_Controller {
       if($this->input->get("date")) { 
          $rp_date = date("Y-m-d",strtotime($this->input->get("date")));
          } else { 
-      	$rp_date = date("Y-m-d");
+      	 $rp_date = date("Y-m-d");
          }
 
       $this->header();
       
-      $data['daily'] = $this->general->fetch_CoustomQuery("SELECT e.EMP_NAME, e.EMP_DEVICE_ID, e.EMP_IMAGE, e.EMP_BPS, 
-						     	d.DESIG_NAME, (SELECT MIN(a.AT_DATE_TIME) FROM attendence as a WHERE 
-						     	a.EMP_DEVICE_ID = e.EMP_DEVICE_ID AND DATE(a.AT_DATE_TIME) = '".$rp_date."' ) as min_time,
-						     	(SELECT MAX(b.AT_DATE_TIME) FROM attendence as b WHERE b.EMP_DEVICE_ID = e.EMP_DEVICE_ID 
-						     	AND DATE(b.AT_DATE_TIME) = '".$rp_date."' ) as max_time
-								FROM `employee` as e
-								LEFT JOIN
-								designations as d
-								ON
-								e.DESIG_ID = d.DESIG_ID");
+            
+         // old daily report query  
+
+         // SELECT e.EMP_NAME, e.EMP_DEVICE_ID, e.EMP_IMAGE, e.EMP_BPS, 
+         //                        d.DESIG_NAME, (SELECT MIN(a.AT_DATE_TIME) FROM attendence as a WHERE 
+         //                        a.EMP_DEVICE_ID = e.EMP_DEVICE_ID AND DATE(a.AT_DATE_TIME) = '".$rp_date."' ) as min_time,
+         //                        (SELECT MAX(b.AT_DATE_TIME) FROM attendence as b WHERE b.EMP_DEVICE_ID = e.EMP_DEVICE_ID 
+         //                        AND DATE(b.AT_DATE_TIME) = '".$rp_date."' ) as max_time
+         //                        FROM `employee` as e
+         //                        LEFT JOIN
+         //                        designations as d
+         //                        ON
+         //                        e.DESIG_ID = d.DESIG_ID
+
+
+      $data['daily'] = $this->general->fetch_CoustomQuery("SELECT e.EMP_NAME, e.EMP_ID, e.EMP_DEVICE_ID, e.EMP_IMAGE, 
+                        e.EMP_BPS, d.DESIG_NAME, (SELECT MIN(a.AT_DATE_TIME) FROM attendence as a 
+                        WHERE 
+                        a.EMP_DEVICE_ID = e.EMP_DEVICE_ID AND DATE(a.AT_DATE_TIME) = '".$rp_date."' ) as min_time,
+                        (SELECT MAX(b.AT_DATE_TIME) FROM attendence as b WHERE b.EMP_DEVICE_ID = e.EMP_DEVICE_ID 
+                        AND DATE(b.AT_DATE_TIME) = '".$rp_date."' ) as max_time, 
+                        IF((SELECT COUNT(1) FROM emp_leave as eel  WHERE eel.EMP_ID = e.EMP_ID AND '".$rp_date."' BETWEEN eel.EL_START_DATE AND eel.EL_END_DATE),(SELECT lt.LEAVE_NAME FROM emp_leave as eel LEFT JOIN leave_types as lt ON eel.LEAVE_ID = lt.LEAVE_ID WHERE eel.EMP_ID = e.EMP_ID AND '".$rp_date."' BETWEEN eel.EL_START_DATE AND eel.EL_END_DATE), 'NO-LEAVE') as leave_status
+                        FROM `employee` as e
+                        LEFT JOIN
+                        designations as d
+                        ON
+                        e.DESIG_ID = d.DESIG_ID");
 
       $data['rp_date'] = $rp_date;
     
@@ -106,14 +123,15 @@ class Reports extends MY_Controller {
    }
 
     
-    public function bring_emp_attend($emp_id, $date) {
+    public function bring_emp_attend($emp_device_id, $date, $emp_id=NULL) {
 
         //  echo $emp_id, "-", $date;
 
-         $dat =  "SELECT MIN(`AT_DATE_TIME`) as min_time, MAX(`AT_DATE_TIME`) as max_time
+         $dat =  "SELECT MIN(`AT_DATE_TIME`) as min_time, MAX(`AT_DATE_TIME`) as max_time,  IF((SELECT COUNT(1) FROM emp_leave as eel  WHERE eel.EMP_ID = $emp_id AND '$date' BETWEEN eel.EL_START_DATE AND eel.EL_END_DATE),(SELECT lt.LEAVE_NAME FROM emp_leave as eel LEFT JOIN leave_types as lt ON eel.LEAVE_ID = lt.LEAVE_ID WHERE eel.EMP_ID = $emp_id AND '$date' BETWEEN eel.EL_START_DATE AND eel.EL_END_DATE), 'NO-LEAVE') as leave_status
                    FROM `attendence` B
                    WHERE DATE_FORMAT(B.AT_DATE_TIME,'%Y-%m-%d') = '$date'
-                   AND B.`EMP_DEVICE_ID` = $emp_id";
+                   AND B.`EMP_DEVICE_ID` = $emp_device_id";
+
 
     	   $query = $this->db->query($dat);
 
@@ -124,6 +142,7 @@ class Reports extends MY_Controller {
               
               $data['max_in'] = $rs->min_time;
               $data['max_out'] = $rs->max_time;
+              $data['leave_status'] = $rs->leave_status;
 
     	    endforeach;	
 
