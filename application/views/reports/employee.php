@@ -57,7 +57,7 @@
                                         $selected = " ";
                                       }
                                 ?>
-                               <option value="<?=$des->EMP_DEVICE_ID;?>" <?=$selected;?>> <?=$des->EMP_NAME;?> (<?=$des->DESIG_NAME;?>) </option>
+                               <option value="<?=$des->EMP_DEVICE_ID;?>-<?=$des->EMP_ID;?>" <?=$selected;?>> <?=$des->EMP_NAME;?> (<?=$des->DESIG_NAME;?>) </option>
                              <?php endforeach; ?> 
                     </select>
                   </div>               
@@ -132,10 +132,25 @@
                             <td> <?=date("d-m-Y",strtotime($em->dte));?> </td>
                             <td> <?=date("l",strtotime($em->dte));?> </td>
                             <?php                            
-                            if($em->min_time == NULL && $em->max_time == NULL ) { ?>
+                            if($em->min_time == NULL && $em->max_time == NULL ) { 
 
-                           <td colspan="2" class="text-danger"> ABSENT </td>
 
+                                if($em->leave_status != "NO-LEAVE") { ?>
+
+                                 
+                                 <td colspan="2" class="text-warning"> <?php echo $em->leave_status; ?> </td>
+                              
+
+                               <?php } else { ?>
+
+                                
+                                <td colspan="2" class="text-danger"> ABSENT </td>
+
+                                <?php }
+
+                                ?>
+
+                            
                           <?php  } else { ?>
 
                             <td> <?=date("h:i A",strtotime($em->min_time));?> </td>

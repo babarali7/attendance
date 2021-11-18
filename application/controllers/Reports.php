@@ -206,7 +206,13 @@ class Reports extends MY_Controller {
           
            if($this->input->get("emp")) {
 
-               $emp = $this->input->get("emp");
+                
+                $emp_xp = explode("-", $this->input->get("emp"));
+
+               // $emp = $this->input->get("emp");
+
+                $emp = $emp_xp[0];
+                $emp_id = $emp_xp[1];
 
                $start_dd = date("Y-m-d",strtotime($dat[0]));
                $end_dd = date("Y-m-d", strtotime($dat[1]));
@@ -215,7 +221,8 @@ class Reports extends MY_Controller {
               (SELECT MIN(a.AT_DATE_TIME) as checkin  FROM `attendence` as a WHERE a.EMP_DEVICE_ID = {$emp} AND 
               DATE(a.AT_DATE_TIME) = dte) as min_time, 
               (SELECT MAX(a.AT_DATE_TIME) as checkin FROM `attendence` as a WHERE a.EMP_DEVICE_ID = {$emp} AND 
-              DATE(a.AT_DATE_TIME) = dte) as max_time  
+              DATE(a.AT_DATE_TIME) = dte) as max_time,
+              IF((SELECT COUNT(1) FROM emp_leave as eel  WHERE eel.EMP_ID = {$emp_id} AND dte BETWEEN eel.EL_START_DATE AND eel.EL_END_DATE),(SELECT lt.LEAVE_NAME FROM emp_leave as eel LEFT JOIN leave_types as lt ON eel.LEAVE_ID = lt.LEAVE_ID WHERE eel.EMP_ID = {$emp_id} AND dte BETWEEN eel.EL_START_DATE AND eel.EL_END_DATE), 'NO-LEAVE') as leave_status  
               FROM 
               (SELECT 0 a UNION SELECT 1 a UNION SELECT 2 UNION SELECT 3 
               UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 
